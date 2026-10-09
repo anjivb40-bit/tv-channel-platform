@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anji's TV</title>
+<meta name="theme-color" content="#0a0a0c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5468'/%3E%3Cstop offset='1' stop-color='%23c81a30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='11' fill='url(%23g)'/%3E%3Cpath d='M14 7.5 20 13.5 26 7.5' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='7' y='14' width='26' height='19' rx='5.5' fill='%23fff'/%3E%3Cpath d='M17.5 19.2v8.6a.9.9 0 0 0 1.4.75l6.6-4.3a.9.9 0 0 0 0-1.5l-6.6-4.3a.9.9 0 0 0-1.4.75z' fill='%23d81f36'/%3E%3C/svg%3E">
+<meta name="description" content="Anji's TV: browse and watch live TV channels in Telugu, Kannada, Tamil, Malayalam, Hindi, English and more.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js"></script>
+<script>(function(){try{var t=JSON.parse(localStorage.getItem("atv:theme"));if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme="dark"}})()</script>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0a0a0c; --surface:#141418; --surface2:#1d1d24; --line:#272730; --text:#f4f4f6; --muted:#9a9aa6;
+    --navbg:rgba(10,10,12,.78); --bga:rgba(10,10,12,.92); --navline:rgba(255,255,255,.06);
+    --ov:rgba(255,255,255,.12); --ov2:rgba(255,255,255,.14); --ov2h:rgba(255,255,255,.24); --ov3:rgba(255,255,255,.3);
+    --inp:rgba(255,255,255,.06); --inph:rgba(255,255,255,.1); --shadow:rgba(0,0,0,.55);
+    --foot:#08080a; --doc:#d4d4da; --nowbg:#2a1519; --noticebg:#2a2410; --noticeline:#4a3d12; --noticetx:#ffd978;
+    --samplebg:#3a2f12; --sampletx:#ffcf5c; --t2:rgba(255,255,255,.75); --t3:rgba(255,255,255,.55);
+    --hs1:60%; --hl1:30%; --hs2:45%; --hl2:13%;
+    --red:#ef233c; --red-d:#c81a30; --pad:clamp(16px,4vw,56px);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#f5f5f8; --surface:#ffffff; --surface2:#ececf1; --line:#d9d9e2; --text:#14141a; --muted:#636370;
+    --navbg:rgba(245,245,248,.82); --bga:rgba(245,245,248,.94); --navline:rgba(0,0,0,.08);
+    --ov:rgba(0,0,0,.07); --ov2:rgba(0,0,0,.08); --ov2h:rgba(0,0,0,.14); --ov3:rgba(0,0,0,.2);
+    --inp:rgba(0,0,0,.05); --inph:rgba(0,0,0,.07); --shadow:rgba(20,20,40,.22);
+    --foot:#ececf1; --doc:#2c2c36; --nowbg:#ffe9ec; --noticebg:#fff6dc; --noticeline:#f0d98a; --noticetx:#6b4e00;
+    --samplebg:#fff0c2; --sampletx:#7a5600; --t2:rgba(0,0,0,.72); --t3:rgba(0,0,0,.55);
+    --hs1:90%; --hl1:80%; --hs2:85%; --hl2:91%;
+  }
+  :root[data-theme="light"] .tile:not(.ini){border:1px solid var(--line)}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+  a{color:inherit;text-decoration:none}
+  button,select,input{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  [hidden]{display:none!important}
+  :focus-visible{outline:2px solid var(--text);outline-offset:3px}
+  #app{flex:1;outline:none}
+
+  /* ---------- Nav ---------- */
+  .nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:22px;padding:12px var(--pad);
+       background:var(--navbg);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid var(--navline)}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.2rem;letter-spacing:-.02em;white-space:nowrap}
+  .logo b{width:34px;height:34px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5468'/%3E%3Cstop offset='1' stop-color='%23c81a30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='11' fill='url(%23g)'/%3E%3Cpath d='M14 7.5 20 13.5 26 7.5' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='7' y='14' width='26' height='19' rx='5.5' fill='%23fff'/%3E%3Cpath d='M17.5 19.2v8.6a.9.9 0 0 0 1.4.75l6.6-4.3a.9.9 0 0 0 0-1.5l-6.6-4.3a.9.9 0 0 0-1.4.75z' fill='%23d81f36'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 4px 10px rgba(239,35,60,.35))}
+  .wm{font-weight:800;letter-spacing:-.03em}
+  .wm em{font-style:normal;color:var(--red);margin-left:.08em}
+  .links{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+  .links::-webkit-scrollbar{display:none}
+  .links a{padding:8px 13px;border-radius:999px;color:var(--muted);font-weight:600;font-size:.92rem;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+  .links a:hover{color:var(--text)}
+  .links a.on{background:var(--ov);color:var(--text)}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 0 rgba(239,35,60,.7);animation:pulse 1.8s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(239,35,60,0)}100%{box-shadow:0 0 0 0 rgba(239,35,60,0)}}
+  .searchbox{position:relative;width:min(280px,30vw)}
+  .searchbox input{width:100%;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--inp);font-size:.9rem}
+  .searchbox input::placeholder{color:var(--muted)}
+  .searchbox input:focus{outline:none;border-color:var(--text);background:var(--inph)}
+  .sugg{position:absolute;top:calc(100% + 8px);right:0;width:min(380px,92vw);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.6);max-height:70vh;overflow:auto}
+  .sugg h4{margin:8px 10px 4px;font-size:.75rem;color:var(--muted);font-weight:600}
+  .sugg a,.sugg button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border-radius:9px;font-size:.92rem}
+  .sugg a:hover,.sugg button:hover,.sugg a:focus,.sugg a:focus-visible{background:var(--surface2)}
+  .sugg img,.sugg .mini{width:30px;height:30px;border-radius:6px;background:#fff;object-fit:contain;flex:none}
+  .sugg .mini{display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff}
+  .sugg small{color:var(--muted);margin-left:auto}
+  .theme{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;flex:none;color:var(--text)}
+  .theme:hover{border-color:var(--text)}
+  .theme svg{width:18px;height:18px}
+  .profile{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);font-weight:700;font-size:.85rem;flex:none}
+  .signin{padding:8px 16px;border-radius:999px;background:var(--red);font-weight:700;font-size:.88rem;flex:none}
+  .signin:hover{background:var(--red-d)}
+
+  /* ---------- Buttons / chips ---------- */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:700;font-size:.98rem;background:var(--red);color:#fff}
+  .btn:hover{background:var(--red-d)}
+  .btn.white{background:var(--text);color:var(--bg)}.btn.white:hover{opacity:.85}
+  .btn.ghost{background:var(--ov2)}.btn.ghost:hover{background:var(--ov2h)}
+  .btn.sm{padding:8px 14px;font-size:.88rem;border-radius:10px}
+  .link{color:var(--muted);text-decoration:underline;font-size:.9rem}.link:hover{color:var(--text)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{padding:7px 14px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted);font-weight:600;font-size:.88rem;white-space:nowrap}
+  .chip:hover{color:var(--text)}
+  .chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:6px;font-size:.72rem;font-weight:800;letter-spacing:.04em;background:var(--ov2)}
+  .badge.live{background:var(--red);color:#fff}
+  .badge.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff}
+  .badge.sample{background:var(--samplebg);color:var(--sampletx)}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;min-height:66vh;display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:0 var(--pad) 70px;
+        background:radial-gradient(120% 140% at 82% 0%,hsl(var(--h) var(--hs1) var(--hl1)) 0%,hsl(var(--h) var(--hs2) var(--hl2)) 48%,var(--bg) 100%)}
+  .hero::after{content:"";position:absolute;inset:auto 0 0 0;height:150px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+  .htx{position:relative;z-index:1;max-width:600px;padding-top:80px}
+  .hero h1{font-size:clamp(2.2rem,6vw,4.3rem);line-height:1.02;letter-spacing:-.035em;margin:16px 0 10px;font-weight:800}
+  .hero p{margin:0 0 8px;color:var(--t2);font-size:1.05rem}
+  .hero .stats{color:var(--t3);font-size:.92rem;margin-bottom:24px}
+  .acts{display:flex;gap:12px;flex-wrap:wrap}
+  .hero .tile{position:relative;z-index:1;width:clamp(180px,25vw,360px);flex:none;border-radius:22px;box-shadow:0 30px 70px var(--shadow);margin-bottom:20px}
+  .dots{position:absolute;z-index:2;left:var(--pad);bottom:32px;display:flex;gap:8px}
+  .dots button{width:26px;height:4px;border-radius:2px;background:var(--ov3)}
+  .dots button.on{background:var(--text)}
+
+  /* ---------- Sections ---------- */
+  .sec{padding:0 var(--pad);margin-top:36px}
+  .sec .shead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .sec h2{font-size:1.3rem;font-weight:700;letter-spacing:-.015em;margin:0}
+  .head{padding:44px var(--pad) 8px}
+  .head h1{font-size:clamp(1.9rem,5vw,3rem);letter-spacing:-.035em;margin:0;font-weight:800}
+  .head p{color:var(--muted);margin:8px 0 0;max-width:70ch}
+  .crumb{color:var(--muted);font-size:.88rem;margin-bottom:8px;display:block}
+  .wrap{position:relative;margin:0 calc(var(--pad) * -1)}
+  .rail{display:flex;gap:16px;overflow-x:auto;padding:6px var(--pad) 14px;scroll-snap-type:x proximity;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail .cell{width:clamp(150px,15vw,208px);flex:none;scroll-snap-align:start;scroll-margin-left:var(--pad)}
+  .arr{position:absolute;top:0;bottom:56px;width:56px;z-index:3;font-size:2rem;color:var(--text);opacity:0;transition:opacity .2s}
+  .arr.l{left:0;background:linear-gradient(90deg,var(--bga),transparent)}
+  .arr.r{right:0;background:linear-gradient(270deg,var(--bga),transparent)}
+  .wrap:hover .arr,.arr:focus-visible{opacity:1}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:22px 16px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+  .ctile{display:flex;flex-direction:column;justify-content:flex-end;min-height:104px;padding:14px 16px;border-radius:16px;
+         background:linear-gradient(135deg,hsl(var(--h) 68% 42%),hsl(calc(var(--h) + 30) 70% 22%));color:#fff;transition:transform .18s}
+  .ctile:hover,.ctile:focus-visible{transform:translateY(-3px)}
+  .ctile b{font-size:1.1rem;letter-spacing:-.01em}
+  .ctile span{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:2px}
+  .ltile{background:var(--surface);border:1px solid var(--line);min-height:96px;color:var(--text)}
+  .ltile span{color:var(--muted)}
+  .ltile b{font-size:1.5rem}
+  .ltile:hover{border-color:hsl(var(--h) 70% 55%)}
+
+  /* ---------- Cards ---------- */
+  .cell{position:relative}
+  .card{display:block}
+  .tile{aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:linear-gradient(145deg,#fbfbfd,#d6d6dc);display:grid;place-items:center;transition:transform .18s,box-shadow .18s;position:relative}
+  .tile img{width:100%;height:100%;object-fit:contain;padding:14%}
+  .tile.ini{background:linear-gradient(145deg,hsl(var(--h) 68% 50%),hsl(calc(var(--h) + 40) 70% 30%));color:#fff;font-weight:800;font-size:1.9rem;letter-spacing:-.02em}
+  .card:hover .tile,.card:focus-visible .tile{transform:scale(1.04);box-shadow:0 14px 34px var(--shadow)}
+  .card .badge{position:absolute;left:8px;top:8px}
+  .nm{margin-top:10px;font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gp{color:var(--muted);font-size:.82rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card.off .tile{opacity:.35}
+  .fav{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.62);backdrop-filter:blur(8px);color:#fff;line-height:1;opacity:0;transition:opacity .15s;z-index:2}
+  .cell:hover .fav,.fav:focus-visible,.fav.on{opacity:1}
+  .fav.on{background:var(--red)}
+  @media(hover:none){.fav{opacity:1}}
+  .lst{display:flex;flex-direction:column;gap:8px}
+  .lst .cell{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+  .lst .card{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+  .lst .tile{width:84px;flex:none;border-radius:10px}
+  .lst .tile .badge{display:none}
+  .lst .nm{margin:0}
+  .lst .fav{position:static;opacity:1;background:var(--surface2);color:var(--text)}
+  .lst .fav.on{background:var(--red);color:#fff}
+
+  /* ---------- Browser ---------- */
+  .browser{padding:18px var(--pad) 0}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .bar input{flex:1;min-width:200px;padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+  .bar input:focus{outline:none;border-color:var(--text)}
+  .bar select{padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+  .bar select option{background:var(--surface)}
+  .vtog{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .vtog button{padding:10px 14px;background:var(--surface);color:var(--muted)}
+  .vtog button.on{background:var(--text);color:var(--bg)}
+  .meta{display:flex;justify-content:space-between;align-items:center;margin:6px 0 16px;color:var(--muted);font-size:.9rem}
+  .more{display:flex;justify-content:center;padding:30px 0}
+  .empty{padding:90px var(--pad);text-align:center;color:var(--muted)}
+  .empty h2{color:var(--text);margin:0 0 8px}
+  .empty .btn{margin-top:18px}
+
+  .skel{aspect-ratio:16/12;border-radius:14px;background:linear-gradient(100deg,var(--surface) 30%,var(--surface2) 50%,var(--surface) 70%);background-size:300% 100%;animation:sh 1.4s infinite}
+  @keyframes sh{from{background-position:100% 0}to{background-position:-100% 0}}
+
+  /* ---------- Watch ---------- */
+  .watch{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:28px;padding:22px var(--pad) 0}
+  .vbox{position:relative;background:#000;border-radius:16px;overflow:hidden;aspect-ratio:16/9;border:1px solid var(--line)}
+  .vbox video{width:100%;height:100%;display:block;background:#000}
+  .vmsg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;background:rgba(0,0,0,.72);color:rgba(255,255,255,.88);line-height:1.5}
+  .vmsg .acts{justify-content:center}
+  .spin{display:inline-block;width:18px;height:18px;border:2px solid var(--line);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-4px;margin-right:10px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .pinfo{display:flex;gap:16px;align-items:flex-start;margin-top:18px}
+  .pinfo .tile{width:96px;flex:none;border-radius:12px}
+  .pinfo h1{margin:0 0 6px;font-size:1.6rem;letter-spacing:-.02em}
+  .pinfo .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .prog{margin-top:18px;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--muted);line-height:1.5}
+  .prog b{color:var(--text)}
+  .side h3{margin:0 0 12px;font-size:1.05rem}
+  .side .lst .tile{width:64px}
+  .side .lst .cell{padding:8px 10px}
+
+  /* ---------- Guide ---------- */
+  .gtools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px var(--pad) 0}
+  .gtools select{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+  .days{display:flex;gap:8px;overflow-x:auto;padding:14px var(--pad) 4px;scrollbar-width:none}
+  .notice{margin:14px var(--pad) 0;padding:12px 16px;border-radius:12px;background:var(--noticebg);border:1px solid var(--noticeline);color:var(--noticetx);font-size:.9rem;line-height:1.5}
+  .gscroll{margin:16px var(--pad) 0;border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:72vh;background:var(--surface)}
+  .gin{position:relative}
+  .grow{display:flex;border-bottom:1px solid var(--line)}
+  .glogo{position:sticky;left:0;z-index:3;width:184px;flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-right:1px solid var(--line)}
+  .glogo .tile{width:56px;flex:none;border-radius:8px}
+  .glogo span{font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gtrack{position:relative;height:68px;flex:none}
+  .ghead{position:sticky;top:0;z-index:4;background:var(--surface2)}
+  .ghead .glogo{background:var(--surface2);z-index:5;height:38px;color:var(--muted);font-size:.8rem}
+  .ghead .gtrack{height:38px}
+  .gt{position:absolute;top:0;padding-left:8px;height:38px;line-height:38px;font-size:.78rem;color:var(--muted);border-left:1px solid var(--line)}
+  .gp2{position:absolute;top:6px;bottom:6px;padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;font-size:.82rem;line-height:1.3}
+  .gp2:hover{border-color:var(--text)}
+  .gp2 b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gp2 small{color:var(--muted)}
+  .gp2.now{border-color:var(--red);background:var(--nowbg)}
+  .nowline{position:absolute;top:0;bottom:0;width:2px;background:var(--red);z-index:2;pointer-events:none}
+
+  .plist a{display:flex;gap:16px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
+  .plist a:hover{border-color:var(--text)}
+  .plist a.now{border-color:var(--red)}
+  .plist time{width:150px;flex:none;color:var(--muted);font-size:.9rem}
+
+  /* ---------- Footer / misc ---------- */
+  .foot{margin-top:70px;padding:36px var(--pad) 40px;border-top:1px solid var(--line);background:var(--foot)}
+  .fcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:28px}
+  .fcols h4{margin:0 0 12px;font-size:.9rem}
+  .fcols a,.fcols span{display:block;color:var(--muted);font-size:.88rem;margin-bottom:8px}
+  .fcols a:hover{color:var(--text)}
+  .fine{margin-top:26px;color:var(--muted);font-size:.8rem;line-height:1.5}
+  .doc{padding:0 var(--pad) 20px;max-width:80ch;line-height:1.65;color:var(--doc)}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem;opacity:0;pointer-events:none;transition:.25s;z-index:100}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  dialog{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:26px;width:min(380px,92vw)}
+  dialog::backdrop{background:rgba(0,0,0,.65)}
+  dialog h2{margin:0 0 6px}
+  dialog p{color:var(--muted);font-size:.9rem;line-height:1.5;margin:0 0 16px}
+  dialog input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);margin-bottom:16px}
+  dialog .acts{justify-content:flex-end}
+
+  @media(max-width:900px){
+    .watch{grid-template-columns:1fr}
+    .searchbox{width:44vw}
+  }
+  @media(max-width:760px){
+    .nav{flex-wrap:wrap;gap:10px 14px}
+    .links{order:3;flex-basis:100%}
+    .searchbox{margin-left:auto}
+    .hero{min-height:58vh}
+    .hero .tile{display:none}
+    .arr{display:none}
+    .glogo{width:120px}.glogo .tile{display:none}
+    .plist time{width:110px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="logo" href="#/home" aria-label="Anji's TV home"><b></b><span class="wm">Anji's <em>TV</em></span></a>
+  <nav class="links" id="links" aria-label="Main">
+    <a href="#/home" data-p="home">Home</a>
+    <a href="#/live" data-p="live"><i class="pulse"></i>Live TV</a>
+    <a href="#/channels" data-p="channels">All Channels</a>
+    <a href="#/categories" data-p="categories">Categories</a>
+    <a href="#/guide" data-p="guide">TV Guide</a>
+    <a href="#/favorites" data-p="favorites">Favorites</a>
+  </nav>
+  <div class="searchbox" id="sbox">
+    <input id="q" type="search" placeholder="Search channels" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sugg" aria-autocomplete="list" aria-label="Search channels, languages and categories">
+    <div class="sugg" id="sugg" role="listbox" aria-label="Search suggestions" hidden></div>
+  </div>
+  <button class="theme" id="theme" type="button"></button>
+  <div id="acct"></div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+<footer class="foot" id="foot"></footer>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="dlg"></dialog>
+
+<script>
+/* =====================================================================
+   CONFIG: edit these to customise the site
+   ===================================================================== */
+const BASE = "https://iptv-org.github.io/iptv/";
+const LANGS = [
+  {code:"tel", name:"Telugu",    native:"తెలుగు"},
+  {code:"kan", name:"Kannada",   native:"ಕನ್ನಡ"},
+  {code:"tam", name:"Tamil",     native:"தமிழ்"},
+  {code:"mal", name:"Malayalam", native:"മലയാളം"},
+  {code:"hin", name:"Hindi",     native:"हिन्दी"},
+  {code:"eng", name:"English",   native:"English"},
+  {code:"mar", name:"Marathi",   native:"मराठी"},
+  {code:"ben", name:"Bengali",   native:"বাংলা"},
+  {code:"pan", name:"Punjabi",   native:"ਪੰਜਾਬੀ"}
+];
+const OTHER = "Other";
+const REGIONAL = ["Telugu","Kannada","Tamil","Malayalam","Marathi","Bengali","Punjabi"];
+const CATS = [
+  {name:"News",          hue:215, blurb:"Headlines, bulletins and live coverage."},
+  {name:"Sports",        hue:140, blurb:"Matches, highlights and sports talk."},
+  {name:"Movies",        hue:280, blurb:"Films around the clock."},
+  {name:"Entertainment", hue:335, blurb:"Serials, comedy, reality and variety."},
+  {name:"Music",         hue:22,  blurb:"Music videos, concerts and hit parades."},
+  {name:"Kids",          hue:48,  blurb:"Cartoons and shows for children."},
+  {name:"Devotional",    hue:34,  blurb:"Prayers, bhajans and spiritual talks."},
+  {name:"Educational",   hue:190, blurb:"Learning, science and documentaries."},
+  {name:"Lifestyle",     hue:165, blurb:"Cooking, travel and living."},
+  {name:"Regional",      hue:355, blurb:"Channels in India's regional languages."}
+];
+const CAT_MAP = {news:"News",sports:"Sports",movies:"Movies",entertainment:"Entertainment",comedy:"Entertainment",series:"Entertainment",
+  classic:"Entertainment",music:"Music",kids:"Kids",animation:"Kids",religious:"Devotional",education:"Educational",science:"Educational",
+  documentary:"Educational",lifestyle:"Lifestyle",cooking:"Lifestyle",travel:"Lifestyle",outdoor:"Lifestyle"};
+const CONTACT_EMAIL = "";   // add your email to show it on the Contact page
+const SOCIAL = [["YouTube",""],["Instagram",""],["X",""],["Facebook",""]];  // add full URLs to activate links
+const PPM = 4;              // TV guide: pixels per minute
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+function h(tag, props, ...kids){
+  const e = document.createElement(tag);
+  for (const k in props || {}){
+    const v = props[k];
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat(9).forEach(x => { if (x != null && x !== false) e.append(x.nodeType ? x : document.createTextNode(x)); });
+  return e;
+}
+const mem = {};
+const store = {
+  get(k, d){ try { const v = localStorage.getItem("atv:" + k); return v == null ? (k in mem ? mem[k] : d) : JSON.parse(v); } catch(e){ return k in mem ? mem[k] : d; } },
+  set(k, v){ mem[k] = v; try { localStorage.setItem("atv:" + k, JSON.stringify(v)); } catch(e){} }
+};
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const hue = s => { let x = 0; for (const ch of s) x = (x * 31 + ch.charCodeAt(0)) % 360; return x; };
+const initials = n => n.replace(/[^\p{L}\p{N} ]/gu, "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "TV";
+const idOf = u => { let x = 5381; for (let i = 0; i < u.length; i++) x = ((x << 5) + x + u.charCodeAt(i)) >>> 0; return x.toString(36); };
+const rnd = seed => () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+const fmtT = m => { const hh = Math.floor(m / 60) % 24, mm = m % 60; return ((hh % 12) || 12) + (mm ? ":" + String(mm).padStart(2, "0") : "") + (hh < 12 ? " AM" : " PM"); };
+const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+function toast(t){ const e = $("#toast"); e.textContent = t; e.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove("show"), 2200); }
+
+/* =====================================================================
+   Data: channels from iptv-org playlists
+   ===================================================================== */
+const state = { list: [], byUrl: new Map(), byId: new Map(), byLang: {}, counts: {lang: {}, cat: {}},
+  ok: new Set(), failed: new Set(), otherP: null, otherLoaded: false, hls: null, timers: [], observers: [], loadErrors: 0, featured: null };
+
+function parse(text){
+  const out = []; let m = null;
+  for (const raw of text.split(/\r?\n/)){
+    const line = raw.trim();
+    if (line.startsWith("#EXTINF")){
+      const attr = k => (line.match(new RegExp(k + '="([^"]*)"')) || [])[1] || "";
+      const i = line.lastIndexOf('",');
+      let name = (i >= 0 ? line.slice(i + 2) : line.slice(line.lastIndexOf(",") + 1)).trim();
+      name = name.replace(/\s*\[[^\]]*\]/g, "").replace(/\s*\(\d{3,4}[pi]\)/g, "").trim() || "Unnamed";
+      m = { name, logo: attr("tvg-logo"), group: attr("group-title") };
+    } else if (line && !line.startsWith("#") && m){ m.url = line; out.push(m); m = null; }
+  }
+  return out;
+}
+function addChannels(items, lang){
+  for (const r of items){
+    let c = state.byUrl.get(r.url);
+    if (!c){
+      let id = idOf(r.url); while (state.byId.has(id)) id += "x";
+      c = { id, name: r.name, logo: r.logo, url: r.url, group: r.group, langs: [] };
+      state.byUrl.set(r.url, c); state.byId.set(id, c); state.list.push(c);
+    }
+    if (!c.langs.includes(lang)) c.langs.push(lang);
+  }
+}
+function finalize(){
+  state.counts = { lang: {}, cat: {} }; state.byLang = {};
+  for (const c of state.list){
+    const set = new Set();
+    (c.group || "").split(";").forEach(g => { const k = g.trim().toLowerCase(); if (k) set.add(CAT_MAP[k] || "General"); });
+    if (!set.size) set.add("General");
+    if (c.langs.some(l => REGIONAL.includes(l))) set.add("Regional");
+    c.cats = [...set];
+    c.cat = c.cats.find(x => x !== "Regional" && x !== "General") || c.cats[0];
+    c.lang = c.langs[0];
+    c.search = (c.name + " " + c.langs.join(" ") + " " + c.cats.join(" ")).toLowerCase();
+    c.langs.forEach(l => { (state.byLang[l] = state.byLang[l] || []).push(c); state.counts.lang[l] = (state.counts.lang[l] || 0) + 1; });
+    c.cats.forEach(k => state.counts.cat[k] = (state.counts.cat[k] || 0) + 1);
+  }
+  for (const l in state.byLang) state.byLang[l].sort((a, b) => (!!b.logo - !!a.logo) || a.name.localeCompare(b.name));
+}
+async function loadAll(){
+  state.loadErrors = 0;
+  const rs = await Promise.allSettled(LANGS.map(async l => {
+    const r = await fetch(BASE + "languages/" + l.code + ".m3u");
+    if (!r.ok) throw new Error(r.status);
+    addChannels(parse(await r.text()), l.name);
+  }));
+  state.loadErrors = rs.filter(r => r.status === "rejected").length;
+  finalize();
+}
+function loadOther(){
+  if (!state.otherP) state.otherP = fetch(BASE + "index.m3u").then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(t => { addChannels(parse(t).filter(r => !state.byUrl.has(r.url)), OTHER); state.otherLoaded = true; finalize(); })
+    .catch(e => { state.otherP = null; throw e; });
+  return state.otherP;
+}
+state.ready = loadAll();
+const findCh = id => state.byId.get(id) || [...favs(), ...recents()].find(c => c.id === id);
+const langNative = n => (LANGS.find(l => l.name === n) || {}).native || n;
+const meta = c => [c.lang || OTHER, c.cat].filter(Boolean).join(", ");
+
+/* ---------- favourites, history, counts ---------- */
+const favs = () => store.get("favs", []);
+const recents = () => store.get("recent", []);
+const slim = c => ({ id: c.id, name: c.name, logo: c.logo, url: c.url, group: c.group, langs: c.langs, lang: c.lang, cats: c.cats, cat: c.cat, search: c.search });
+const isFav = c => favs().some(f => f.id === c.id);
+function toggleFav(c){
+  const a = favs(), i = a.findIndex(f => f.id === c.id);
+  if (i >= 0){ a.splice(i, 1); toast("Removed from Favorites"); } else { a.unshift(slim(c)); toast("Added to Favorites"); }
+  store.set("favs", a); syncFavs();
+  if (parseHash().parts[0] === "favorites") render();
+}
+function syncFavs(){
+  document.querySelectorAll("[data-fav]").forEach(el => {
+    const on = isFav(el._c); el.classList.toggle("on", on);
+    if (el.dataset.fav === "icon"){ el.textContent = on ? "✓" : "+"; el.setAttribute("aria-label", (on ? "Remove " : "Add ") + el._c.name + (on ? " from" : " to") + " Favorites"); }
+    else el.textContent = on ? "✓ In Favorites" : "+ Add to Favorites";
+  });
+}
+function addRecent(c){ store.set("recent", [slim(c), ...recents().filter(r => r.id !== c.id)].slice(0, 24)); }
+const watchCount = id => (store.get("counts", {}))[id] || 0;
+function bumpCount(id){ const o = store.get("counts", {}); o[id] = (o[id] || 0) + 1; store.set("counts", o); }
+
+/* =====================================================================
+   Sample schedule (clearly labelled, never presented as real)
+   ===================================================================== */
+const TITLES = {
+  News:["Morning Headlines","Daily Bulletin","Prime Time News","Business Watch","Night Roundup"],
+  Sports:["Match Highlights","Sports Today","Sports Desk","Game Replay"],
+  Movies:["Feature Film","Matinee Movie","Prime Time Cinema","Classic Film"],
+  Entertainment:["Drama Hour","Serial Episode","Comedy Time","Reality Special","Variety Show"],
+  Music:["Top Hits","Music Hour","Request Show","Concert Special"],
+  Kids:["Cartoon Time","Story Hour","Kids Club","Adventure Toons"],
+  Devotional:["Morning Prayers","Bhakti Sangeet","Spiritual Talk","Evening Aarti"],
+  Educational:["Learning Hour","Science Today","Documentary","Knowledge Quest"],
+  Lifestyle:["Cooking Show","Travel Diaries","Home & Living","Wellness Hour"],
+};
+function schedule(c, day){
+  const r = rnd(parseInt(c.id, 36) + day * 7919), pool = TITLES[c.cat] || ["Programme","Special Presentation","Featured Show"];
+  const out = []; let t = 0;
+  while (t < 1440){ const d = [30, 60, 60, 90, 120][Math.floor(r() * 5)], end = Math.min(1440, t + d);
+    out.push({ start: t, end, title: pool[Math.floor(r() * pool.length)], desc: "Sample listing. Real programme details aren't connected yet." }); t = end; }
+  return out;
+}
+const dayLabel = o => { if (o === 0) return "Today"; if (o === 1) return "Tomorrow"; const d = new Date(Date.now() + o * 864e5); return d.toLocaleDateString(undefined, {weekday:"short", day:"numeric", month:"short"}); };
+
+/* =====================================================================
+   Reusable components
+   ===================================================================== */
+function tile(c, eager){
+  const t = h("div", {class: "tile"}); t.style.setProperty("--h", hue(c.name));
+  const fb = () => { t.classList.add("ini"); t.textContent = initials(c.name); };
+  if (c.logo){ const i = new Image(); i.alt = ""; if (!eager) i.loading = "lazy"; i.onerror = () => { i.remove(); fb(); }; i.src = c.logo; t.append(i); } else fb();
+  return t;
+}
+function favBtn(c){ const b = h("button", {class: "fav", "data-fav": "icon", onclick: e => { e.preventDefault(); e.stopPropagation(); toggleFav(c); }}); b._c = c; return b; }
+function chCard(c){
+  const t = tile(c);
+  if (state.ok.has(c.id)) t.append(h("span", {class: "badge live"}, "LIVE"));
+  return h("div", {class: "cell"},
+    h("a", {class: "card" + (state.failed.has(c.id) ? " off" : ""), href: "#/watch/" + c.id, title: c.name}, t,
+      h("div", {style: "min-width:0;flex:1"}, h("div", {class: "nm"}, c.name), h("div", {class: "gp"}, meta(c)))),
+    favBtn(c));
+}
+function arrow(d, rail){ return h("button", {class: "arr " + (d < 0 ? "l" : "r"), "aria-label": d < 0 ? "Scroll left" : "Scroll right", onclick: () => rail.scrollBy({left: d * rail.clientWidth * .8, behavior: "smooth"})}, d < 0 ? "‹" : "›"); }
+function rail(title, items, href){
+  const r = h("div", {class: "rail"}, items.map(chCard));
+  return h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, title), href && h("a", {class: "link", href}, "See all")),
+    h("div", {class: "wrap"}, arrow(-1, r), r, arrow(1, r)));
+}
+function chips(items, active, pick, label){
+  return h("div", {class: "chips", role: "group", "aria-label": label},
+    items.map(([v, t]) => h("button", {class: "chip" + (v === active ? " on" : ""), "aria-pressed": v === active, onclick: () => pick(v)}, t)));
+}
+function head(title, sub, crumb){ return h("div", {class: "head"}, crumb && h("a", {class: "crumb", href: crumb[1]}, "‹ " + crumb[0]), h("h1", {}, title), sub && h("p", {}, sub)); }
+const empty = (t, p, btn) => h("div", {class: "empty"}, h("h2", {}, t), h("p", {}, p), btn);
+function skeleton(){ return h("div", {}, h("div", {class: "head"}, h("div", {class: "skel", style: "height:40px;width:260px;aspect-ratio:auto"})),
+  h("div", {class: "sec"}, h("div", {class: "grid"}, Array.from({length: 12}, () => h("div", {class: "skel"}))))); }
+
+/* ---------- The channel browser (search + combined filters + sort + views + infinite scroll) ---------- */
+function browser(o){
+  const st = { q: o.q || "", lang: o.lang || o.lockLang || "", cat: o.cat || o.lockCat || "", sort: o.sort || "az", view: o.view || store.get("view", "grid") };
+  const PAGE = 48; let list = [], shown = 0, token = 0;
+  const input = h("input", {type: "search", placeholder: "Search by channel name, language or category", "aria-label": "Search channels", value: st.q,
+    oninput: debounce(e => { st.q = e.target.value.trim(); refresh(); }, 200)});
+  const sort = h("select", {"aria-label": "Sort channels", onchange: e => { st.sort = e.target.value; refresh(); }},
+    h("option", {value: "az"}, "A–Z"), h("option", {value: "za"}, "Z–A"), h("option", {value: "watched"}, "Most watched on this device"));
+  sort.value = st.sort;
+  const vg = h("button", {"aria-label": "Grid view", onclick: () => setView("grid")}, "▦ Grid");
+  const vl = h("button", {"aria-label": "List view", onclick: () => setView("list")}, "☰ List");
+  const langRow = h("div"), catRow = h("div"), count = h("span", {"aria-live": "polite"});
+  const clear = h("button", {class: "link", onclick: () => { st.q = ""; input.value = ""; st.lang = o.lockLang || ""; st.cat = o.lockCat || ""; refresh(); }}, "Clear filters");
+  const results = h("div"), moreBtn = h("button", {class: "btn ghost", onclick: () => more()}, "Show more");
+  const moreWrap = h("div", {class: "more"}, moreBtn), sentinel = h("div", {style: "height:1px"});
+  const root = h("section", {class: "browser"},
+    h("div", {class: "bar"}, input, sort, h("div", {class: "vtog"}, vg, vl)),
+    langRow, catRow, h("div", {class: "meta"}, count, clear), results, sentinel, moreWrap);
+
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting) more(); }, {rootMargin: "600px"});
+  io.observe(sentinel); state.observers.push(io);
+
+  function setView(v){ st.view = v; store.set("view", v); renderResults(); markView(); }
+  function markView(){ vg.classList.toggle("on", st.view === "grid"); vl.classList.toggle("on", st.view === "list"); vg.setAttribute("aria-pressed", st.view === "grid"); vl.setAttribute("aria-pressed", st.view === "list"); }
+  function filtered(){
+    const toks = st.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const a = state.list.filter(c => (!st.lang || c.langs.includes(st.lang)) && (!st.cat || c.cats.includes(st.cat)) && toks.every(t => c.search.includes(t)));
+    if (st.sort === "az") a.sort((x, y) => x.name.localeCompare(y.name));
+    else if (st.sort === "za") a.sort((x, y) => y.name.localeCompare(x.name));
+    else a.sort((x, y) => (watchCount(y.id) - watchCount(x.id)) || (isFav(y) - isFav(x)) || x.name.localeCompare(y.name));
+    return a;
+  }
+  function chipRows(){
+    if (!o.lockLang) langRow.replaceChildren(chips([["", "All languages"], ...LANGS.map(l => [l.name, l.name]), [OTHER, "Other"]], st.lang, v => { st.lang = v; refresh(); }, "Filter by language"));
+    if (!o.lockCat) catRow.replaceChildren(chips([["", "All categories"], ...CATS.map(c => [c.name, c.name]), ["General", "General"]], st.cat, v => { st.cat = v; refresh(); }, "Filter by category"));
+  }
+  function syncUrl(){
+    if (!o.base) return;
+    const p = new URLSearchParams();
+    if (st.q) p.set("q", st.q);
+    if (st.lang && !o.lockLang) p.set("lang", st.lang);
+    if (st.cat && !o.lockCat) p.set("cat", st.cat);
+    if (st.sort !== "az") p.set("sort", st.sort);
+    const s = p.toString(); history.replaceState(null, "", o.base + (s ? "?" + s : ""));
+  }
+  function more(){
+    if (shown >= list.length) return;
+    const frag = document.createDocumentFragment();
+    list.slice(shown, shown + PAGE).forEach(c => frag.append(chCard(c)));
+    results.append(frag); shown = Math.min(list.length, shown + PAGE); moreWrap.hidden = shown >= list.length; syncFavs();
+  }
+  function renderResults(){
+    results.className = st.view === "grid" ? "grid" : "lst"; results.replaceChildren(); shown = 0;
+    if (!list.length){
+      results.className = ""; moreWrap.hidden = true;
+      results.append(empty("No channels match", "Try a different search, or clear a filter.", h("button", {class: "btn", onclick: () => clear.click()}, "Clear filters"))); return;
+    }
+    more();
+  }
+  async function refresh(){
+    const my = ++token; chipRows(); syncUrl(); markView();
+    clear.hidden = !(st.q || (st.lang && !o.lockLang) || (st.cat && !o.lockCat));
+    if (st.lang === OTHER && !state.otherLoaded){
+      results.className = "grid"; results.replaceChildren(...Array.from({length: 8}, () => h("div", {class: "skel"}))); moreWrap.hidden = true; count.textContent = "Loading more channels…";
+      try { await loadOther(); } catch(e){ if (my === token){ results.className = ""; results.replaceChildren(empty("Couldn't load more channels", "Check your connection and try again.", h("button", {class: "btn", onclick: refresh}, "Try again"))); count.textContent = ""; } return; }
+      if (my !== token) return;
+    }
+    list = filtered();
+    count.textContent = list.length.toLocaleString() + (list.length === 1 ? " channel" : " channels");
+    renderResults();
+  }
+  if (o.alsoOther && !state.otherLoaded) loadOther().then(() => { if (root.isConnected) refresh(); }).catch(() => {});
+  refresh();
+  return root;
+}
+
+/* =====================================================================
+   Player
+   ===================================================================== */
+function stopPlayer(){ if (state.hls){ state.hls.destroy(); state.hls = null; } const v = document.querySelector("#app video"); if (v){ v.pause(); v.removeAttribute("src"); v.load(); } }
+function startStream(c, video, msg, liveBadge, nextHref){
+  const show = (html, withActions) => {
+    msg.hidden = false; msg.replaceChildren(...html);
+    if (withActions) msg.append(h("div", {class: "acts"}, h("button", {class: "btn sm", onclick: () => start()}, "Try again"), h("a", {class: "btn sm ghost", href: nextHref}, "Next channel")));
+  };
+  const fail = () => {
+    state.failed.add(c.id); state.ok.delete(c.id); liveBadge.hidden = true;
+    const insecure = c.url.startsWith("http:") && location.protocol === "https:";
+    show([h("b", {}, "This channel isn't available right now."),
+      h("span", {}, insecure ? "Its stream uses an insecure (http) link, which browsers block on secure pages." :
+        "The broadcaster may be offline, restricted to certain regions, blocking browser playback, or requiring authorization.")], true);
+  };
+  function start(){
+    show([h("div", {}, h("span", {class: "spin"}), "Connecting…")]);
+    if (state.hls){ state.hls.destroy(); state.hls = null; }
+    let counted = false;
+    video.onplaying = () => { msg.hidden = true; state.ok.add(c.id); state.failed.delete(c.id); liveBadge.hidden = false; if (!counted){ counted = true; bumpCount(c.id); } };
+    video.onerror = fail;
+    if (window.Hls && Hls.isSupported() && /m3u8/i.test(c.url)){
+      const hl = state.hls = new Hls();
+      hl.loadSource(c.url); hl.attachMedia(video);
+      hl.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => show([h("span", {}, "Press play to start watching.")])));
+      hl.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) fail(); });
+    } else { video.src = c.url; video.play().catch(() => {}); }
+  }
+  start();
+}
+function siblings(c){ return state.byLang[c.lang] || [c]; }
+function related(c){
+  const same = siblings(c).filter(x => x.id !== c.id);
+  const best = same.filter(x => x.cats.some(k => c.cats.includes(k) && k !== "Regional"));
+  return [...best, ...same.filter(x => !best.includes(x))].slice(0, 24);
+}
+
+/* =====================================================================
+   Pages
+   ===================================================================== */
+const pages = {};
+
+pages.home = () => {
+  const L = LANGS.map(l => l.name), pick = [];
+  if (!state.featured){
+    const ok = state.list.filter(c => state.ok.has(c.id));
+    ok.slice(0, 2).forEach(c => pick.push(c));
+    for (const l of L){ if (pick.length >= 6) break; const pool = (state.byLang[l] || []).filter(c => c.logo && !pick.includes(c)).slice(0, 25);
+      if (pool.length) pick.push(pool[Math.floor(Math.random() * pool.length)]); }
+    state.featured = pick;
+  }
+  const feats = state.featured; let fi = 0;
+  const heroEl = h("section", {class: "hero", "aria-label": "Featured channels"}), dots = h("div", {class: "dots"});
+  function drawHero(){
+    const c = feats[fi]; if (!c) return;
+    heroEl.style.setProperty("--h", hue(c.name));
+    heroEl.replaceChildren(
+      h("div", {class: "htx"},
+        state.ok.has(c.id) ? h("span", {class: "badge live"}, "LIVE") : h("span", {class: "badge"}, "FEATURED CHANNEL"),
+        h("h1", {}, c.name), h("p", {}, meta(c)),
+        h("div", {class: "stats"}, state.list.length.toLocaleString() + " channels in " + (LANGS.length + 1) + " languages, across " + CATS.length + " categories"),
+        h("div", {class: "acts"}, h("a", {class: "btn", href: "#/watch/" + c.id}, "▶ Watch Live"), h("a", {class: "btn ghost", href: "#/channels"}, "Browse Channels"))),
+      tile(c, true), dots);
+    dots.replaceChildren(...feats.map((_, i) => h("button", {class: i === fi ? "on" : "", "aria-label": "Show featured channel " + (i + 1), onclick: () => { fi = i; drawHero(); }})));
+  }
+  drawHero();
+  const nodes = [heroEl];
+  const rec = recents(), fv = favs();
+  if (rec.length) nodes.push(rail("Continue watching", rec.slice(0, 20)));
+  if (fv.length) nodes.push(rail("Your favorites", fv.slice(0, 30), "#/favorites"));
+  nodes.push(h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, "Browse by category"), h("a", {class: "link", href: "#/categories"}, "See all")),
+    h("div", {class: "tiles"}, CATS.map(k => h("a", {class: "ctile", href: "#/category/" + k.name, style: "--h:" + k.hue}, h("b", {}, k.name), h("span", {}, (state.counts.cat[k.name] || 0) + " channels"))))));
+  nodes.push(h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, "Browse by language")),
+    h("div", {class: "tiles"}, [...LANGS.map(l => [l.name, l.native]), [OTHER, "Other languages"]].map(([n, nat]) =>
+      h("a", {class: "ctile ltile", href: "#/language/" + n, style: "--h:" + hue(n)}, h("b", {}, nat), h("span", {}, n === OTHER ? "More channels worldwide" : n + ", " + (state.counts.lang[n] || 0) + " channels"))))));
+  LANGS.forEach(l => { const items = (state.byLang[l.name] || []).slice(0, 30); if (items.length) nodes.push(rail(l.name + " channels", items, "#/language/" + l.name)); });
+  return h("div", {}, ...nodes);
+};
+
+pages.live = () => {
+  const r = recents()[0] || (state.byLang.Telugu || state.list)[0];
+  if (r){ location.replace("#/watch/" + r.id); return h("div"); }
+  return empty("No channels yet", "Channels are still loading.");
+};
+
+pages.categories = () => h("div", {}, head("Categories", "Pick a category to see every channel in it."),
+  h("section", {class: "sec"}, h("div", {class: "tiles"}, CATS.map(k =>
+    h("a", {class: "ctile", href: "#/category/" + k.name, style: "--h:" + k.hue}, h("b", {}, k.name), h("span", {}, (state.counts.cat[k.name] || 0) + " channels"), h("span", {}, k.blurb))))));
+
+pages.category = r => {
+  const name = r.parts[1], k = CATS.find(c => c.name === name) || {name, blurb: ""};
+  return h("div", {}, head(k.name, k.blurb, ["Categories", "#/categories"]),
+    browser({lockCat: k.name, lang: r.q.get("lang") || "", q: r.q.get("q") || "", sort: r.q.get("sort") || "", base: "#/category/" + encodeURIComponent(k.name)}));
+};
+pages.language = r => {
+  const name = r.parts[1];
+  return h("div", {}, head(name === OTHER ? "Other languages" : name, name === OTHER ? "Channels from other languages and regions." : langNative(name) + ". Live channels in " + name + ".", ["Home", "#/home"]),
+    browser({lockLang: name, cat: r.q.get("cat") || "", q: r.q.get("q") || "", sort: r.q.get("sort") || "", base: "#/language/" + encodeURIComponent(name)}));
+};
+pages.channels = r => h("div", {}, head("All Channels", state.list.length.toLocaleString() + " live channels. Combine search, language and category to narrow them down."),
+  browser({q: r.q.get("q") || "", lang: r.q.get("lang") || "", cat: r.q.get("cat") || "", sort: r.q.get("sort") || "", base: "#/channels"}));
+
+pages.search = r => {
+  const q = (r.q.get("q") || "").trim(), t = q.toLowerCase();
+  const ls = [...LANGS.map(l => l.name), OTHER].filter(n => t && (n.toLowerCase().includes(t) || langNative(n).toLowerCase().includes(t)));
+  const cs = CATS.filter(k => t && k.name.toLowerCase().includes(t));
+  return h("div", {}, head(q ? "Results for “" + q + "”" : "Search", "Channels, languages and categories. Programme search will appear once real schedule data is connected."),
+    (ls.length || cs.length) && h("section", {class: "sec", style: "margin-top:18px"}, h("div", {class: "chips"},
+      ls.map(n => h("a", {class: "chip", href: "#/language/" + n}, "Language: " + n)), cs.map(k => h("a", {class: "chip", href: "#/category/" + k.name}, "Category: " + k.name)))),
+    browser({q, alsoOther: true, base: "#/search"}));
+};
+
+pages.favorites = () => {
+  const fv = favs(), rec = recents();
+  const nodes = [head("Favorites", "Your saved channels live on this device.")];
+  if (!fv.length) nodes.push(empty("No favorites yet", "Tap the + on any channel to save it here.", h("a", {class: "btn", href: "#/channels"}, "Browse channels")));
+  else nodes.push(h("section", {class: "sec", style: "margin-top:18px"}, h("div", {class: "grid"}, fv.map(chCard))));
+  if (rec.length) nodes.push(h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, "Recently watched"),
+    h("button", {class: "link", onclick: () => { store.set("recent", []); render(); }}, "Clear history")), h("div", {class: "grid"}, rec.map(chCard))));
+  return h("div", {}, ...nodes);
+};
+
+pages.watch = async r => {
+  let c = findCh(r.parts[1]);
+  if (!c && !state.otherLoaded){ try { await loadOther(); } catch(e){} c = findCh(r.parts[1]); }
+  if (!c) return empty("Channel not found", "It may have been removed from the playlist.", h("a", {class: "btn", href: "#/channels"}, "Browse channels"));
+  addRecent(c);
+  const sib = siblings(c), i = Math.max(0, sib.findIndex(x => x.id === c.id));
+  const prev = sib[(i - 1 + sib.length) % sib.length], next = sib[(i + 1) % sib.length];
+  const video = h("video", {controls: true, playsinline: true, autoplay: true, "aria-label": c.name + " live stream"});
+  const msg = h("div", {class: "vmsg"}), live = h("span", {class: "badge live", hidden: true}, "LIVE");
+  const fb = h("button", {class: "btn sm ghost", "data-fav": "text", onclick: () => toggleFav(c)}); fb._c = c;
+  const rel = related(c);
+  const wrapper = h("div", {},
+    h("div", {class: "watch"},
+      h("div", {},
+        h("div", {class: "vbox"}, video, msg),
+        h("div", {class: "pinfo"}, tile(c, true),
+          h("div", {style: "min-width:0;flex:1"}, h("h1", {}, c.name),
+            h("div", {class: "row"}, live, h("span", {class: "badge"}, c.lang || OTHER), h("span", {class: "badge"}, c.cat)),
+            h("div", {class: "row"}, h("a", {class: "btn sm ghost", href: "#/watch/" + prev.id}, "‹ Previous"), h("a", {class: "btn sm ghost", href: "#/watch/" + next.id}, "Next ›"), fb,
+              h("a", {class: "btn sm ghost", href: "#/channel/" + c.id}, "Channel details")))),
+        h("div", {class: "prog"}, h("b", {}, "Now playing: "), "Programme information isn't available for this channel yet. Schedule data hasn't been connected.")),
+      h("aside", {class: "side"}, h("h3", {}, "Related channels"), h("div", {class: "lst"}, rel.slice(0, 12).map(chCard)))),
+    rail("More channels", rel.slice(12).length ? rel.slice(12) : (state.byLang[c.lang] || []).slice(0, 30), "#/language/" + c.lang));
+  setTimeout(() => { startStream(c, video, msg, live, "#/watch/" + next.id); syncFavs(); }, 0);
+  return wrapper;
+};
+
+pages.channel = async r => {
+  let c = findCh(r.parts[1]);
+  if (!c && !state.otherLoaded){ try { await loadOther(); } catch(e){} c = findCh(r.parts[1]); }
+  if (!c) return empty("Channel not found", "It may have been removed from the playlist.", h("a", {class: "btn", href: "#/channels"}, "Browse channels"));
+  const fb = h("button", {class: "btn ghost", "data-fav": "text", onclick: () => toggleFav(c)}); fb._c = c;
+  const prog = schedule(c, 0), now = nowMin();
+  setTimeout(syncFavs, 0);
+  return h("div", {},
+    h("section", {class: "hero", style: "min-height:46vh;--h:" + hue(c.name)},
+      h("div", {class: "htx"}, state.ok.has(c.id) ? h("span", {class: "badge live"}, "LIVE") : h("span", {class: "badge"}, "CHANNEL"), h("h1", {}, c.name), h("p", {}, meta(c)),
+        h("div", {class: "acts", style: "margin-top:18px"}, h("a", {class: "btn", href: "#/watch/" + c.id}, "▶ Watch Live"), fb)), tile(c, true)),
+    h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, "Today's schedule"), h("span", {class: "badge sample"}, "SAMPLE")),
+      h("div", {class: "plist"}, prog.map(p => h("a", {class: now >= p.start && now < p.end ? "now" : "", href: "#/program/" + c.id + "/0/" + p.start},
+        h("time", {}, fmtT(p.start) + " – " + fmtT(p.end)), h("span", {}, p.title))))),
+    rail("More " + (c.lang || "") + " channels", related(c), "#/language/" + c.lang));
+};
+
+pages.program = r => {
+  const c = findCh(r.parts[1]), day = +r.parts[2] || 0, start = +r.parts[3] || 0;
+  if (!c) return empty("Programme not found", "Go back to the TV guide.", h("a", {class: "btn", href: "#/guide"}, "TV Guide"));
+  const list = schedule(c, day), p = list.find(x => x.start === start) || list[0];
+  return h("div", {}, head(p.title, dayLabel(day) + ", " + fmtT(p.start) + " – " + fmtT(p.end), ["TV Guide", "#/guide"]),
+    h("section", {class: "sec", style: "margin-top:18px"}, h("span", {class: "badge sample"}, "SAMPLE LISTING"),
+      h("p", {class: "doc", style: "padding:14px 0"}, p.desc),
+      h("div", {class: "lst", style: "max-width:520px"}, chCard(c)),
+      h("div", {class: "acts", style: "margin-top:18px"}, h("a", {class: "btn", href: "#/watch/" + c.id}, "▶ Watch channel"), h("a", {class: "btn ghost", href: "#/channel/" + c.id}, "Channel details"))),
+    h("section", {class: "sec"}, h("div", {class: "shead"}, h("h2", {}, "Later on " + c.name)),
+      h("div", {class: "plist"}, list.filter(x => x.start > p.start).slice(0, 6).map(x => h("a", {href: "#/program/" + c.id + "/" + day + "/" + x.start}, h("time", {}, fmtT(x.start) + " – " + fmtT(x.end)), h("span", {}, x.title))))));
+};
+
+pages.guide = r => {
+  const st = { lang: r.q.get("lang") || "Telugu", cat: r.q.get("cat") || "", day: +r.q.get("day") || 0, n: 30 };
+  const root = h("div", {}, head("TV Guide", "A timeline of what's on, channel by channel."));
+  const tools = h("div", {class: "gtools"}), days = h("div", {class: "days"}), wrap = h("div");
+  root.append(tools, days, h("div", {class: "notice", role: "note"}, h("b", {}, "Sample schedule. "), "Real programme data isn't connected yet, so these listings are placeholders that show how the guide will look. Don't rely on them for what's actually airing."), wrap);
+  function draw(keepScroll){
+    history.replaceState(null, "", "#/guide?lang=" + encodeURIComponent(st.lang) + (st.cat ? "&cat=" + encodeURIComponent(st.cat) : "") + "&day=" + st.day);
+    const ls = h("select", {"aria-label": "Language", onchange: e => { st.lang = e.target.value; st.n = 30; draw(); }}, [...LANGS.map(l => l.name), OTHER].map(n => h("option", {value: n}, n))); ls.value = st.lang;
+    const cs = h("select", {"aria-label": "Category", onchange: e => { st.cat = e.target.value; st.n = 30; draw(); }}, h("option", {value: ""}, "All categories"), CATS.map(k => h("option", {value: k.name}, k.name))); cs.value = st.cat;
+    tools.replaceChildren(ls, cs);
+    days.replaceChildren(...Array.from({length: 7}, (_, o) => h("button", {class: "chip" + (o === st.day ? " on" : ""), onclick: () => { st.day = o; draw(); }}, dayLabel(o))));
+    const all = (state.byLang[st.lang] || []).filter(c => !st.cat || c.cats.includes(st.cat));
+    const chs = all.slice(0, st.n), W = 1440 * PPM, prevScroll = wrap.firstChild ? wrap.firstChild.scrollLeft : null;
+    if (!chs.length){ wrap.replaceChildren(empty("No channels", "Try another language or category.")); return; }
+    const times = h("div", {class: "gtrack", style: "width:" + W + "px"}, Array.from({length: 48}, (_, i) => h("div", {class: "gt", style: "left:" + (i * 30 * PPM) + "px;width:" + (30 * PPM) + "px"}, fmtT(i * 30))));
+    const inner = h("div", {class: "gin", style: "width:" + (184 + W) + "px"}, h("div", {class: "grow ghead"}, h("div", {class: "glogo"}, "Channel"), times));
+    const nm = nowMin();
+    chs.forEach(c => {
+      const tr = h("div", {class: "gtrack", style: "width:" + W + "px"}, schedule(c, st.day).map(p =>
+        h("a", {class: "gp2" + (st.day === 0 && nm >= p.start && nm < p.end ? " now" : ""), style: "left:" + (p.start * PPM) + "px;width:" + ((p.end - p.start) * PPM - 6) + "px", href: "#/program/" + c.id + "/" + st.day + "/" + p.start},
+          h("b", {}, p.title), h("small", {}, fmtT(p.start) + " – " + fmtT(p.end)))));
+      inner.append(h("div", {class: "grow"}, h("a", {class: "glogo", href: "#/channel/" + c.id}, tile(c), h("span", {}, c.name)), tr));
+    });
+    clearInterval(st.tick);
+    let line = null;
+    if (st.day === 0){ line = h("div", {class: "nowline", "aria-hidden": "true"}); const place = () => line.style.left = (184 + nowMin() * PPM) + "px"; place(); inner.append(line); clearInterval(st.tick); st.tick = setInterval(place, 30000); state.timers.push(st.tick); }
+    const sc = h("div", {class: "gscroll", style: "margin:16px 0 0"}, inner);
+    const box = h("div", {style: "padding:0 var(--pad)"}, sc);
+    if (all.length > st.n) box.append(h("div", {class: "more"}, h("button", {class: "btn ghost", onclick: () => { st.n += 30; draw(true); }}, "Show more channels (" + (all.length - st.n) + " left)")));
+    wrap.replaceChildren(box);
+    setTimeout(() => { sc.scrollLeft = prevScroll != null && keepScroll ? prevScroll : (st.day === 0 ? Math.max(0, nowMin() * PPM - 60) : 8 * 60 * PPM); }, 0);
+  }
+  draw();
+  return root;
+};
+
+const DOCS = {
+  about: ["About Anji's TV", "Anji's TV is a personal project that brings live TV channels from many languages into one easy place to browse and watch. Channel names, logos and streams come from the public iptv-org community playlists, grouped here by language and category."],
+  contact: ["Contact", CONTACT_EMAIL ? "Reach out at " + CONTACT_EMAIL + "." : "Contact details haven't been added yet."],
+  help: ["Help Center", "If a channel says it isn't available, the broadcaster may be offline, limited to certain countries, or blocking playback in web browsers. Use Next channel to try another. Favorites and history are stored in this browser, so clearing site data will remove them. Programme listings in the TV Guide are samples until real schedule data is connected."],
+  privacy: ["Privacy Policy", "Anji's TV has no server and no account system. Your profile name, favorites, recently watched channels and preferences are saved only in your browser's local storage on this device. Playlists are fetched from GitHub (iptv-org), and video streams load directly from each broadcaster, who can see your IP address like any website you visit."],
+  terms: ["Terms of Service", "Anji's TV does not host, own or control any streams. Channels are listed from public community playlists and may change or disappear at any time. You are responsible for making sure that watching a channel is allowed where you live. The service is provided as is, without warranties."],
+  devices: ["Supported devices", "Anji's TV runs in current versions of Chrome, Edge, Firefox and Safari on computers, tablets and phones. Smart TVs and streaming sticks with a modern web browser may also work. HLS streams play natively on Safari and through hls.js elsewhere."]
+};
+pages.page = r => { const d = DOCS[r.parts[1]]; if (!d) return notFound(); return h("div", {}, head(d[0]), h("div", {class: "doc", style: "margin-top:12px"}, h("p", {}, d[1]))); };
+const notFound = () => empty("Page not found", "That page doesn't exist.", h("a", {class: "btn", href: "#/home"}, "Go home"));
+
+/* =====================================================================
+   Router, nav, search, profile, footer
+   ===================================================================== */
+const app = $("#app");
+let tok = 0;
+function parseHash(){ const raw = location.hash.replace(/^#/, "") || "/home"; const [p, qs] = raw.split("?"); return { parts: p.split("/").filter(Boolean).map(decodeURIComponent), q: new URLSearchParams(qs || "") }; }
+function cleanup(){ stopPlayer(); state.timers.forEach(clearInterval); state.timers = []; state.observers.forEach(o => o.disconnect()); state.observers = []; }
+async function render(){
+  const my = ++tok; cleanup();
+  const r = parseHash(), page = r.parts[0] || "home";
+  const navKey = { category: "categories", language: "channels", search: "channels", watch: "live", channel: "channels", program: "guide" }[page] || page;
+  document.querySelectorAll("#links a").forEach(a => { a.classList.toggle("on", a.dataset.p === navKey); a.toggleAttribute("aria-current", a.dataset.p === navKey); });
+  if (page === "search") $("#q").value = r.q.get("q") || "";
+  window.scrollTo(0, 0);
+  app.replaceChildren(skeleton());
+  try {
+    await state.ready; if (my !== tok) return;
+    if (!state.list.length){
+      app.replaceChildren(empty("Couldn't load channels", "Check your internet connection and try again.", h("button", {class: "btn", onclick: () => { state.ready = loadAll(); render(); }}, "Try again"))); return;
+    }
+    const node = await (pages[page] || notFound)(r); if (my !== tok) return;
+    app.replaceChildren(node); syncFavs();
+    document.title = (page === "watch" ? (findCh(r.parts[1]) || {}).name + " | " : "") + "Anji's TV";
+  } catch(e){ if (my === tok){ console.error(e); app.replaceChildren(empty("Something went wrong", "Please try again.", h("button", {class: "btn", onclick: render}, "Reload page"))); } }
+}
+addEventListener("hashchange", render);
+
+/* search suggestions */
+const q = $("#q"), sugg = $("#sugg"), sbox = $("#sbox");
+const recentSearches = () => store.get("searches", []);
+function saveSearch(t){ t = t.trim(); if (t) store.set("searches", [t, ...recentSearches().filter(x => x !== t)].slice(0, 6)); }
+function drawSugg(){
+  const t = q.value.trim().toLowerCase(), kids = [];
+  if (!t){
+    const rs = recentSearches();
+    if (!rs.length){ sugg.hidden = true; return; }
+    kids.push(h("h4", {}, "Recent searches"), ...rs.map(s => h("a", {href: "#/search?q=" + encodeURIComponent(s)}, s)));
+  } else {
+    const ls = [...LANGS.map(l => l.name), OTHER].filter(n => n.toLowerCase().includes(t) || langNative(n).toLowerCase().includes(t)).slice(0, 3);
+    const cs = CATS.filter(k => k.name.toLowerCase().includes(t)).slice(0, 3);
+    const toks = t.split(/\s+/), chs = state.list.filter(c => toks.every(x => c.search.includes(x))).slice(0, 6);
+    if (ls.length) kids.push(h("h4", {}, "Languages"), ...ls.map(n => h("a", {href: "#/language/" + n}, n, h("small", {}, state.counts.lang[n] ? state.counts.lang[n] + " channels" : ""))));
+    if (cs.length) kids.push(h("h4", {}, "Categories"), ...cs.map(k => h("a", {href: "#/category/" + k.name}, k.name, h("small", {}, (state.counts.cat[k.name] || 0) + " channels"))));
+    if (chs.length) kids.push(h("h4", {}, "Channels"), ...chs.map(c => h("a", {href: "#/watch/" + c.id, onclick: () => saveSearch(q.value)}, c.logo ? h("img", {src: c.logo, alt: "", onerror: e => e.target.replaceWith(h("div", {class: "mini", style: "background:hsl(" + hue(c.name) + " 60% 40%)"}, initials(c.name)))}) : h("div", {class: "mini", style: "background:hsl(" + hue(c.name) + " 60% 40%)"}, initials(c.name)), c.name, h("small", {}, c.lang))));
+    kids.push(h("a", {href: "#/search?q=" + encodeURIComponent(q.value.trim())}, "See all results for “" + q.value.trim() + "”"));
+  }
+  sugg.replaceChildren(...kids); sugg.querySelectorAll("a").forEach(a => a.setAttribute("role", "option")); sugg.querySelectorAll("h4").forEach(x => x.setAttribute("role", "presentation")); sugg.hidden = false;
+}
+q.addEventListener("input", debounce(drawSugg, 120));
+q.addEventListener("focus", () => state.ready.then(drawSugg));
+q.addEventListener("keydown", e => {
+  if (e.key === "Enter" && q.value.trim()){ saveSearch(q.value); sugg.hidden = true; location.hash = "#/search?q=" + encodeURIComponent(q.value.trim()); q.blur(); }
+  if (e.key === "Escape"){ sugg.hidden = true; q.blur(); }
+});
+new MutationObserver(() => q.setAttribute("aria-expanded", String(!sugg.hidden))).observe(sugg, {attributes: true, attributeFilter: ["hidden"]});
+const suggItems = () => [...sugg.querySelectorAll("a")];
+q.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown"){ e.preventDefault(); if (sugg.hidden) drawSugg(); const it = suggItems()[0]; if (it) it.focus(); }
+});
+sugg.addEventListener("keydown", e => {
+  const it = suggItems(), i = it.indexOf(document.activeElement);
+  if (e.key === "ArrowDown"){ e.preventDefault(); it[Math.min(it.length - 1, i + 1)].focus(); }
+  else if (e.key === "ArrowUp"){ e.preventDefault(); if (i <= 0) q.focus(); else it[i - 1].focus(); }
+  else if (e.key === "Escape"){ sugg.hidden = true; q.focus(); }
+});
+sbox.addEventListener("focusout", e => { if (!sbox.contains(e.relatedTarget)) setTimeout(() => sugg.hidden = true, 120); });
+sugg.addEventListener("click", () => setTimeout(() => sugg.hidden = true, 0));
+
+/* day / night theme */
+const root = document.documentElement;
+const themeNow = () => root.dataset.theme === "light" ? "light" : "dark";
+const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>';
+function applyTheme(t, save){
+  root.dataset.theme = t;
+  document.querySelector('meta[name="theme-color"]').content = t === "light" ? "#f5f5f8" : "#0a0a0c";
+  if (save) store.set("theme", t);
+  const b = $("#theme"), light = t === "light";
+  b.innerHTML = light ? MOON : SUN;
+  b.title = b.ariaLabel = light ? "Switch to night mode" : "Switch to day mode";
+  b.setAttribute("aria-label", b.title);
+}
+$("#theme").addEventListener("click", () => applyTheme(themeNow() === "light" ? "dark" : "light", true));
+matchMedia("(prefers-color-scheme: light)").addEventListener("change", e => { if (store.get("theme", null) == null) applyTheme(e.matches ? "light" : "dark"); });
+applyTheme(themeNow());
+
+/* local profile (no server) */
+function drawAcct(){
+  const u = store.get("user", "");
+  $("#acct").replaceChildren(u ? h("button", {class: "profile", "aria-label": "Profile", onclick: openDlg}, u[0].toUpperCase()) : h("button", {class: "signin", onclick: openDlg}, "Sign In"));
+}
+function openDlg(){
+  const d = $("#dlg"), u = store.get("user", ""), inp = h("input", {id: "uname", placeholder: "Your name", value: u, maxlength: 24, "aria-label": "Your name"});
+  d.replaceChildren(h("h2", {}, u ? "Hi, " + u : "Sign in"), h("p", {}, "There are no online accounts here. Your name, favorites and history stay in this browser on this device."), inp,
+    h("div", {class: "acts"}, u && h("button", {class: "btn ghost sm", onclick: () => { store.set("user", ""); drawAcct(); d.close(); toast("Signed out"); }}, "Sign out"),
+      h("button", {class: "btn ghost sm", onclick: () => d.close()}, "Cancel"),
+      h("button", {class: "btn sm", onclick: () => { const v = inp.value.trim(); if (v){ store.set("user", v); drawAcct(); d.close(); toast("Welcome, " + v); } }}, "Save")));
+  d.showModal(); inp.focus();
+}
+drawAcct();
+
+/* footer */
+$("#foot").append(
+  h("div", {class: "fcols"},
+    h("div", {}, h("div", {class: "logo", style: "margin-bottom:12px"}, h("b"), h("span", {class: "wm"}, "Anji's ", h("em", {}, "TV"))), h("span", {}, "Live TV from many languages, in one place.")),
+    h("div", {}, h("h4", {}, "Explore"), h("a", {href: "#/channels"}, "All Channels"), h("a", {href: "#/categories"}, "Categories"), h("a", {href: "#/guide"}, "TV Guide"), h("a", {href: "#/favorites"}, "Favorites")),
+    h("div", {}, h("h4", {}, "Support"), h("a", {href: "#/page/about"}, "About Us"), h("a", {href: "#/page/contact"}, "Contact"), h("a", {href: "#/page/help"}, "Help Center"), h("a", {href: "#/page/devices"}, "Supported devices")),
+    h("div", {}, h("h4", {}, "Legal"), h("a", {href: "#/page/privacy"}, "Privacy Policy"), h("a", {href: "#/page/terms"}, "Terms of Service")),
+    h("div", {}, h("h4", {}, "Follow"), SOCIAL.map(([n, u]) => u ? h("a", {href: u, target: "_blank", rel: "noopener"}, n) : h("span", {title: "Add your link in the SOCIAL setting"}, n)))),
+  h("p", {class: "fine"}, "Anji's TV doesn't host any streams. Channels and logos come from the public iptv-org playlists and belong to their respective owners. Availability can change at any time."));
+
+render();
+</script>
+</body>
+</html>
